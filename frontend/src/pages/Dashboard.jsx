@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { feedbackApi } from '../api';
 
 export default function Dashboard() {
   const [feedbacks, setFeedbacks] = useState([]);
   const navigate = useNavigate();
-  const API_URL = 'http://localhost:5000/api/feedback';
 
   const fetchItems = async () => {
     try { 
-      const res = await axios.get(API_URL); 
+      const res = await feedbackApi.get('/');
       setFeedbacks(res.data); 
     } catch (e) { 
       console.error("Error connecting to database logic", e); 
@@ -21,7 +20,7 @@ export default function Dashboard() {
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this course feedback entry?")) {
       try {
-        await axios.delete(`${API_URL}/${id}`);
+        await feedbackApi.delete(`/${id}`);
         setFeedbacks(feedbacks.filter(f => f._id !== id));
       } catch (err) {
         alert("Failed to delete record.");

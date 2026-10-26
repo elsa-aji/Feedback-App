@@ -11,7 +11,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // 3. Setup Global Middleware
-app.use(cors());
+const frontendOrigins = (
+  process.env.FRONTEND_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173'
+)
+  .split(',')
+  .map((origin) => origin.trim());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || frontendOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error('Origin not allowed by CORS'));
+  }
+}));
 app.use(express.json());
 
 // 4. Establish MongoDB Connection
@@ -31,6 +44,13 @@ const feedbackSchema = new mongoose.Schema({
 const Feedback = mongoose.model('Feedback', feedbackSchema);
 
 // 6. REST API Endpoints
+
+app.get('/health', (req, res) => {
+  const databaseConnected = mongoose.connection.readyState === 1;
+  res.status(databaseConnected ? 200 : 503).json({
+    status: databaseConnected ? 'ok' : 'unavailable'
+  });
+});
 
 // GET: Fetch all feedback items
 app.get('/api/feedback', async (req, res) => {

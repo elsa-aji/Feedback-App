@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: feedback-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_ORIGIN
+        value: https://feedback-frontend.onrender.com
+
+  - type: web
+    name: feedback-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://feedback-api.onrender.com/api/feedback
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

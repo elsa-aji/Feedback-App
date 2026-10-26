@@ -14,7 +14,7 @@ cd backend
 npm install
 npm start
 ```
-*Note: A `.env` file containing dummy/test MongoDB Atlas configurations has been included in the repository as requested for evaluation verification.*
+Set `MONGODB_URI` in `backend/.env` before starting the backend. A template is available in `backend/.env.example`.
 
 ### 2. Frontend Setup
 ```bash
@@ -22,6 +22,18 @@ cd ../frontend
 npm install
 npm run dev
 ```
+The frontend uses `http://localhost:5000/api/feedback` by default. Set `VITE_API_URL` in `frontend/.env` to override it; see `frontend/.env.example`.
+
+## Deploy both services to Render
+
+The root `render.yaml` defines a Node web service for the API and a static site for the Vite frontend.
+
+1. Push the project to a Git provider connected to Render, then create a new **Blueprint** in Render and select this repository.
+2. When prompted, set the `MONGODB_URI` secret to a production MongoDB connection string. Do not commit this value.
+3. Deploy the Blueprint. It builds the frontend with the API URL and configures the API to allow the deployed frontend origin.
+4. The API health check is available at `/health`; it reports healthy only after MongoDB connects.
+
+The Render service names and URLs in `render.yaml` are `feedback-api` and `feedback-frontend`. If you change either name or use a custom domain, update `VITE_API_URL` and `FRONTEND_ORIGIN` to match, then redeploy.
 
 ## ✨ Core Features Evaluated
 - **Full CRUD Endpoints:** Add, Read, Update, and Delete feedback models.

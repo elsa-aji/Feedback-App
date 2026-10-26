@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { feedbackApi } from '../api';
 
 export default function FeedbackForm() {
   const location = useLocation();
@@ -21,12 +21,11 @@ export default function FeedbackForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const API_URL = 'http://localhost:5000/api/feedback';
     try {
       if (editRecord) { 
-        await axios.put(`${API_URL}/${editRecord._id}`, formData); 
+        await feedbackApi.put(`/${editRecord._id}`, formData);
       } else { 
-        await axios.post(API_URL, formData); 
+        await feedbackApi.post('/', formData);
       }
       navigate('/');
     } catch (err) {
